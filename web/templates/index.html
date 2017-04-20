@@ -6,8 +6,18 @@
             width: 100%;
             height: 60%;
         }
-        .third-div{
-            width: 33.3%;
+		.first-div{
+			width: 20%;
+            height: 100%;
+            float: left;
+		}
+        .second-div{
+            width: 50%;
+            height: 100%;
+            float: left;
+        }
+		.third-div{
+            width: 30%;
             height: 100%;
             float: left;
         }
@@ -44,17 +54,19 @@
 	<script type="text/javascript" src="{% static "js/jquery-1.8.3.min.js" %}"></script>
 	<script type="text/javascript" src="{% static "js/dateRange.js" %}"></script>
 	<script type="text/javascript" src="{% static "js/monthPicker.js" %}"></script>
-	<script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script> 
+	<script type="text/javascript" src="{% static "js/bootstrap.min.js" %}"></script>
+	<script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
 	
 	<link rel="stylesheet" type="text/css" href="{% static "css/dateRange.css" %}"/>
 	<link rel="stylesheet" type="text/css" href="{% static "css/monthPicker.css" %}"/>
 	<link rel="stylesheet" href="{% static "css/site.css" %}">
+	<link rel="stylesheet" media="screen" href="{% static "css/bootstrap.min.css" %}">
 </head>
 
 <body>
 	<fieldset class="cont">
 	<div class="list">
-		<label><s>*</s>查询方式:</label>
+		<label class="help-block"><s>*</s>查询方式:</label>
 		<select size="1" name="D1" onChange="javascript:queryData('mune_x'+this.value)">  
 			<option value="1">ip</option> 
 			<option value="2">时间</option> 
@@ -64,7 +76,7 @@
 
 	<!-------------------------------ip-------------------------------------->
 	<div class="list" id="x1">
-		<label><s>*</s>ip:</label>
+		<label class="help-block"><s>*</s>ip:</label>
 		<input type="text" value="" name="ip" placeholder="请输入要查询的ip">
 	</div>
 
@@ -109,22 +121,22 @@
 	</div>
 	<!-------------------------------dump-------------------------------------->
 	<div class="list" id="x3" style="display:none">
-		<label><s>*</s>dump:</label>
+		<label class="help-block"><s>*</s>dump:</label>
 		<select size="1" name="dump">  
 			<option value="1">是</option> 
 			<option value="0">否</option> 
 		</select> 
 	</div>
 	<div class="list">
-		<button id="directNextpage" onclick="flushName(1)">搜索</button>  
+		<button id="directNextpage" class="btn" onclick="flushName(1)">搜索</button>  
 	</div>
 </fieldset>
 	<div class="main">
 		<!-- 编辑器的列表 -->
-		<div class="third-div" align="center">
+		<div class="first-div" align="center">
 			<h1>编辑器列表</h1>
 			<br/>
-			<table id="editortable" cellspacing="20">
+			<table id="editortable" class="table table-striped table-bordered">
 				<thread>
 					<tr>
 						<th align="left">名称</th>
@@ -133,36 +145,36 @@
 				{% for editor in eidtorname %}
 				<tr>
 					{% ifequal editor.name ename %}
-						<td class="yellow" onclick="flushUser(1, this)">{{ editor.name }}</td>
+						<td onclick="flushUser(1, this)">{{ editor.name }}</td>
 					{% else %}
 						<td onclick="flushUser(1, this)">{{ editor.name }}</td>
 					{% endifequal %}
 				</tr>
 				{% endfor %}
 			</table>
-			<div id="namepage">
+			<div id="namepage" class="pagination">
 				{% if eidtorname.has_previous %}
-					<a class='paginator' title='上一页' onclick="flushName('{{eidtorname.previous_page_number }}')"><span>&lt;&lt;</span></a>
+					<a title='上一页' onclick="flushName('{{eidtorname.previous_page_number }}')"><span>&lt;&lt;</span></a>
 				{% endif %}
 				{% for page in eidtorname.paginator.page_range_ext %}
 					{% if page == eidtorname.number %}
-						<a class='paginator_current' onclick="flushName('{{ page }}')" title='当前页:{{ page }}'><span>{{ page }}</span></a>
+						<a onclick="flushName('{{ page }}')" title='当前页:{{ page }}'><span>{{ page }}</span></a>
 					{% else %}
-						<a class='paginator' onclick="flushName('{{ page }}')" title='{{ page }}'><span>{{ page }}</span></a>
+						<a  onclick="flushName('{{ page }}')" title='{{ page }}'><span>{{ page }}</span></a>
 					{% endif %}
 				{% endfor %}
 				{% if eidtorname.has_next %}
-					<a class='paginator' title='下一页' onclick="flushName('{{eidtorname.next_page_number }}')"><span>&gt;&gt;</span></a>
+					<a title='下一页' onclick="flushName('{{eidtorname.next_page_number }}')"><span>&gt;&gt;</span></a>
 				{% endif %}
 			</div>
 		</div>
 		<!-- 编辑器的详细信息 -->
-		<div class="third-div" align="center">
+		<div class="second-div"  align="center">
 			<h1>使用情况</h1>
 			<br/>
-			<table id="usertable" cellspacing="20">
+			<table id="usertable" class="table table-striped  table-bordered">
 				<thread>
-					<tr>
+					<tr class="success">
 						<th>ID</th>
 						<th>IP</th>
 						<th>开始时间</th>
@@ -172,9 +184,9 @@
 					</tr>
 				</thread>
 				{% for editor in editorUser %}
-				<tr align="center">
+				<tr>
 					{% ifequal editor.id eid %}
-						<td class="yellow" onclick="flushOpt( 1, this )" >{{ editor.id }}</td>
+						<td onclick="flushOpt( 1, this )" >{{ editor.id }}</td>
 					{% else %}
 						<td onclick="flushOpt( 1, this )" >{{ editor.id }}</td>
 					{% endifequal %}
@@ -189,19 +201,19 @@
 				{% endfor %}
 			</table>
 			
-			<div id="userpage">
+			<div id="userpage" class="pagination">
 				{% if editorUser.has_previous %}
-					<a class='paginator' title='上一页' onclick="flushUser('{{ editorUser.previous_page_number }}')"><span>&lt;&lt;</span></a>
+					<a title='上一页' onclick="flushUser('{{ editorUser.previous_page_number }}')"><span>&lt;&lt;</span></a>
 				{% endif %}
 				{% for page in editorUser.paginator.page_range_ext %}
 					{% if page == editorUser.number %}
-						<a class='paginator_current' onclick="flushUser('{{ page }}')" title='当前页:{{ page }}'><span>{{ page }}</span></a>
+						<a onclick="flushUser('{{ page }}')" title='当前页:{{ page }}'><span>{{ page }}</span></a>
 					{% else %}
-						<a class='paginator' onclick="flushUser('{{ page }}')" title='{{ page }}'><span>{{ page }}</span></a>
+						<a onclick="flushUser('{{ page }}')" title='{{ page }}'><span>{{ page }}</span></a>
 					{% endif %}
 				{% endfor %}
 				{% if editorUser.has_next %}
-					<a class='paginator' title='下一页' onclick="flushUser('{{ editorUser.next_page_number }}')"><span>&gt;&gt;</span></a>
+					<a title='下一页' onclick="flushUser('{{ editorUser.next_page_number }}')"><span>&gt;&gt;</span></a>
 				{% endif %}
 			</div>
 		</div>
@@ -209,7 +221,7 @@
 		<div class="third-div" align="center">
 			<h1>操作列表</h1>
 			<br/>
-			<table id="opttable" cellspacing="20">
+			<table id="opttable" class="table table-striped  table-bordered">
 				<thread>
 					<tr>
 						<th>时间</th>
@@ -217,25 +229,25 @@
 					</tr>
 				</thread>
 				{% for o in opt %}
-				<tr align="center">
+				<tr>
 					<td>{{ o.time }}</td>
 					<td>{{ o.cmd }}</td>
 				</tr>
 				{% endfor %}
 			</table>
-			<div id="optpage">
+			<div id="optpage" class="pagination">
 				{% if opt.has_previous %}
-					<a class='paginator' title='上一页' onclick="flushOpt('{{ opt.previous_page_number }}')"><span>&lt;&lt;</span></a>
+					<a title='上一页' onclick="flushOpt('{{ opt.previous_page_number }}')"><span>&lt;&lt;</span></a>
 				{% endif %}
 				{% for page in opt.paginator.page_range_ext %}
 					{% if page == opt.number %}
-						<a class='paginator_current' onclick="flushOpt('{{ page }}')" title='当前页:{{ page }}'><span>{{ page }}</span></a>
+						<a onclick="flushOpt('{{ page }}')" title='当前页:{{ page }}'><span>{{ page }}</span></a>
 					{% else %}
-						<a class='paginator' onclick="flushOpt('{{ page }}')" title='{{ page }}'><span>{{ page }}</span></a>
+						<a onclick="flushOpt('{{ page }}')" title='{{ page }}'><span>{{ page }}</span></a>
 					{% endif %}
 				{% endfor %}
 				{% if opt.has_next %}
-					<a class='paginator' title='下一页' onclick="flushOpt('{{ opt.next_page_number }}')"><span>&gt;&gt;</span></a>
+					<a title='下一页' onclick="flushOpt('{{ opt.next_page_number }}')"><span>&gt;&gt;</span></a>
 				{% endif %}
 			</div>
 		</div>
@@ -348,7 +360,6 @@
 			pageDiv.innerHTML = ""
 			if (data[0]["has_previous"]) {
 				var a = document.createElement("a")
-				a.className = "paginator"
 				a.onclick = function() { pageFunc(page - 1) }
 				a.title = "上一页"
 				a.innerHTML = "<span>&lt;&lt;</span>"
@@ -358,13 +369,11 @@
 			for (var i = 0; i < data[0]["page_rang"].length; ++i) {
 				var a = document.createElement("a")
 				if (data[0]["page_rang"][i] == page) {
-					a.className = "paginator_current"
 					a.onclick = function() { pageFunc(page) }
 					a.title = "当前页：" + page
 					a.innerHTML = "<span>" + page + "</span>"
 				}
 				else {
-					a.className = "paginator"
 					var temp = data[0]["page_rang"][i]
 					a.onclick = function() { pageFunc(temp) }
 					a.title = data[0]["page_rang"][i]
@@ -375,7 +384,6 @@
 
 			if (data[0]["has_next"]) {
 				var a = document.createElement("a")
-				a.className = "paginator"
 				a.onclick = function() { pageFunc(page + 1) }
 				a.title = "下一页"
 				a.innerHTML = "<span>&gt;&gt;</span>"
@@ -431,6 +439,9 @@
 					attTd.href = "download/?id="+idTD.innerHTML
 					attTd.target = '_blank'
 					attTd.innerHTML = "附件"
+				}else {
+					attTd = document.createElement("td")
+					attTd.innerHTML = "-"
 				}
 
 				tr.appendChild(idTD)
@@ -606,7 +617,7 @@
 			var rawCount = table.rows.length
 			for (var i = rawCount - 1; i > 0; --i) {
 				//table.rows[i].cells[0].style.color="#000"
-				table.rows[i].cells[0].className = ""
+				//table.rows[i].cells[0].className = ""
 			}
 
 			var param = ""
@@ -631,7 +642,7 @@
 			if (obj) {
 				$.getJSON("http://"+url+"/searchUser/?" + param, updateChart)
 			}
-			currEditor.className = "yellow"
+			//currEditor.className = "warning"
 		}
 
 		function flushOpt(currPage, obj) {
@@ -645,14 +656,14 @@
 			var rawCount = table.rows.length
 			for (var i = rawCount - 1; i > 0; --i) {
 				//table.rows[i].cells[0].style.color="#000"
-				table.rows[i].cells[0].className = ""
+				//table.rows[i].cells[0].className = ""
 			}
 
 			//obj.style.color="#FFC706"
 			//obj.className = "yellow"
 			//var url = window.location.host
 			$.getJSON("http://"+url+"/searchOpt?id="+currUserID.innerHTML  + "&optpage="+currPage, updateOptList)
-			currUserID.className = "yellow"
+			//currUserID.className = "warning"
 		}
 
 		function convertTimestampToDate(timestamp) {
