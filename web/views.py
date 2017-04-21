@@ -113,9 +113,10 @@ class Search(object):
         
         editorname_json = json.dumps(list(editorName))
         j = json.loads(editorname_json)
-        j[0]["has_previous"] = editorName.has_previous()
-        j[0]['has_next'] = editorName.has_next()
-        j[0]['page_rang'] = editorName.paginator.page_range_ext
+        if len(j) > 0:
+            j[0]["has_previous"] = editorName.has_previous()
+            j[0]['has_next'] = editorName.has_next()
+            j[0]['page_rang'] = editorName.paginator.page_range_ext
         return HttpResponse(json.dumps(j))
     @staticmethod
     def searchUser(request):
@@ -143,16 +144,22 @@ class Search(object):
 
             user_json = serialize("json", editor, cls=DjangoOverRideJSONEncoder)
             j = json.loads(user_json)
-            j[0]["has_previous"] = editor.has_previous()
-            j[0]['has_next'] = editor.has_next()
-            j[0]['page_rang'] = editor.paginator.page_range_ext
+            if len(j) > 0:
+                j[0]["has_previous"] = editor.has_previous()
+                j[0]['has_next'] = editor.has_next()
+                j[0]['page_rang'] = editor.paginator.page_range_ext
             return HttpResponse(json.dumps(j))
 
     @staticmethod
     def searchOpt(request):
         opt = SQL.getOptByID(request.GET.get('id'), request.GET.get('optpage'))
         opt_json = serialize("json", opt, cls=DjangoOverRideJSONEncoder)
-        return HttpResponse(opt_json)
+        j = json.loads(opt_json)
+        if len(j) > 0:
+            j[0]["has_previous"] = opt.has_previous()
+            j[0]['has_next'] = opt.has_next()
+            j[0]['page_rang'] = opt.paginator.page_range_ext
+        return HttpResponse(json.dumps(j))
 
 def get_file_names(directory, parentdir):
     contents = os.listdir(directory)

@@ -54,13 +54,12 @@
 	<script type="text/javascript" src="{% static "js/jquery-1.8.3.min.js" %}"></script>
 	<script type="text/javascript" src="{% static "js/dateRange.js" %}"></script>
 	<script type="text/javascript" src="{% static "js/monthPicker.js" %}"></script>
-	<script type="text/javascript" src="{% static "js/bootstrap.min.js" %}"></script>
+	<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
 	
 	<link rel="stylesheet" type="text/css" href="{% static "css/dateRange.css" %}"/>
 	<link rel="stylesheet" type="text/css" href="{% static "css/monthPicker.css" %}"/>
-	<link rel="stylesheet" href="{% static "css/site.css" %}">
-	<link rel="stylesheet" media="screen" href="{% static "css/bootstrap.min.css" %}">
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -152,29 +151,29 @@
 				</tr>
 				{% endfor %}
 			</table>
-			<div id="namepage" class="pagination">
+			<ul id="namepage" class="pagination">
 				{% if eidtorname.has_previous %}
-					<a title='上一页' onclick="flushName('{{eidtorname.previous_page_number }}')"><span>&lt;&lt;</span></a>
+					<li><a title='上一页' onclick="flushName('{{eidtorname.previous_page_number }}')">&lt;&lt;</a></li>
 				{% endif %}
 				{% for page in eidtorname.paginator.page_range_ext %}
 					{% if page == eidtorname.number %}
-						<a onclick="flushName('{{ page }}')" title='当前页:{{ page }}'><span>{{ page }}</span></a>
+						<li class="active"><a onclick="flushName('{{ page }}')" title='当前页:{{ page }}'>{{ page }}</a></li>
 					{% else %}
-						<a  onclick="flushName('{{ page }}')" title='{{ page }}'><span>{{ page }}</span></a>
+						<li><a  onclick="flushName('{{ page }}')" title='{{ page }}'>{{ page }}</a></li>
 					{% endif %}
 				{% endfor %}
 				{% if eidtorname.has_next %}
-					<a title='下一页' onclick="flushName('{{eidtorname.next_page_number }}')"><span>&gt;&gt;</span></a>
+					<li><a title='下一页' onclick="flushName('{{eidtorname.next_page_number }}')">&gt;&gt;</a></li>
 				{% endif %}
-			</div>
+			</ul>
 		</div>
 		<!-- 编辑器的详细信息 -->
-		<div class="second-div"  align="center">
+		<div class="second-div" align="center">
 			<h1>使用情况</h1>
 			<br/>
-			<table id="usertable" class="table table-striped  table-bordered">
+			<table id="usertable" class="table table-striped table-bordered">
 				<thread>
-					<tr class="success">
+					<tr align="left">
 						<th>ID</th>
 						<th>IP</th>
 						<th>开始时间</th>
@@ -200,22 +199,21 @@
 				</tr>
 				{% endfor %}
 			</table>
-			
-			<div id="userpage" class="pagination">
+			<ul id="userpage" class="pagination">
 				{% if editorUser.has_previous %}
-					<a title='上一页' onclick="flushUser('{{ editorUser.previous_page_number }}')"><span>&lt;&lt;</span></a>
+					<li><a title='上一页' onclick="flushUser('{{ editorUser.previous_page_number }}')">&lt;&lt;</a></li>
 				{% endif %}
 				{% for page in editorUser.paginator.page_range_ext %}
 					{% if page == editorUser.number %}
-						<a onclick="flushUser('{{ page }}')" title='当前页:{{ page }}'><span>{{ page }}</span></a>
+						<li class="active"><a onclick="flushUser('{{ page }}')" title='当前页:{{ page }}'>{{ page }}</a></li>
 					{% else %}
-						<a onclick="flushUser('{{ page }}')" title='{{ page }}'><span>{{ page }}</span></a>
+						<li><a onclick="flushUser('{{ page }}')" title='{{ page }}'>{{ page }}</a></li>
 					{% endif %}
 				{% endfor %}
 				{% if editorUser.has_next %}
-					<a title='下一页' onclick="flushUser('{{ editorUser.next_page_number }}')"><span>&gt;&gt;</span></a>
+					<li><a title='下一页' onclick="flushUser('{{ editorUser.next_page_number }}')">&gt;&gt;</a></li>
 				{% endif %}
-			</div>
+			</ul>
 		</div>
 		<!-- 编辑器的操作 -->
 		<div class="third-div" align="center">
@@ -235,21 +233,21 @@
 				</tr>
 				{% endfor %}
 			</table>
-			<div id="optpage" class="pagination">
+			<ul id="optpage" class="pagination">
 				{% if opt.has_previous %}
-					<a title='上一页' onclick="flushOpt('{{ opt.previous_page_number }}')"><span>&lt;&lt;</span></a>
+					<li><a title='上一页' onclick="flushOpt('{{ opt.previous_page_number }}')">&lt;&lt;</a></li>
 				{% endif %}
 				{% for page in opt.paginator.page_range_ext %}
 					{% if page == opt.number %}
-						<a onclick="flushOpt('{{ page }}')" title='当前页:{{ page }}'><span>{{ page }}</span></a>
+						<li class="active"><a onclick="flushOpt('{{ page }}')" title='当前页:{{ page }}'>{{ page }}</a></li>
 					{% else %}
-						<a onclick="flushOpt('{{ page }}')" title='{{ page }}'><span>{{ page }}</span></a>
+						<li><a onclick="flushOpt('{{ page }}')" title='{{ page }}'>{{ page }}</a></li>
 					{% endif %}
 				{% endfor %}
 				{% if opt.has_next %}
-					<a title='下一页' onclick="flushOpt('{{ opt.next_page_number }}')"><span>&gt;&gt;</span></a>
+					<li><a title='下一页' onclick="flushOpt('{{ opt.next_page_number }}')">&gt;&gt;</a></li>
 				{% endif %}
-			</div>
+			</ul>
 		</div>
 		
 
@@ -319,25 +317,24 @@
 			var startName = ""
 			var startTD
 			for (var i = 0; i < data.length; ++i) {
-				var tr = document.createElement("tr")
-				var nameTD = document.createElement("td")
+				var currentRows = table.rows.length
+				var tr = table.insertRow(currentRows)
+				var nameTD = tr.insertCell(0)
 				nameTD.innerHTML = data[i]["name"]
 				nameTD.onclick = function() { currEditor = this; flushUser(1, this) }
 				if (i == 0) {
 					startName = data[i]["name"]
 					startTD = nameTD
 				}
-
-				tr.appendChild(nameTD)
-				table.appendChild(tr)
 			}
 			updatePage(data, document.getElementById("namepage"))
-			//TODO 改变颜色
+			
 			currEditor = startTD
 			flushUser(1, startTD)
 		}
 
 		function updatePage(data, obj) {
+			//console.log(data)
 			if ($.isEmptyObject(data) || data.length <= 0) {
 				obj.innerHTML = ""
 				return
@@ -349,6 +346,8 @@
 				page = currNamePage
 				pageFunc = flushName
 			}else if(obj.id == "userpage") {
+				console.log("currUserpage:"+currUserPage)
+				console.log("rang:"+data[0]["page_rang"])
 				page = currUserPage	
 				pageFunc = flushUser
 			}else {
@@ -359,35 +358,43 @@
 			var pageDiv = obj
 			pageDiv.innerHTML = ""
 			if (data[0]["has_previous"]) {
+				var li = document.createElement("li")
 				var a = document.createElement("a")
 				a.onclick = function() { pageFunc(page - 1) }
 				a.title = "上一页"
-				a.innerHTML = "<span>&lt;&lt;</span>"
-				pageDiv.appendChild(a)
+				a.innerHTML = "&lt;&lt;"
+				li.appendChild(a)
+				pageDiv.appendChild(li)
 			}
 			
 			for (var i = 0; i < data[0]["page_rang"].length; ++i) {
+				var li = document.createElement("li")
 				var a = document.createElement("a")
 				if (data[0]["page_rang"][i] == page) {
+					console.log("ttt"+page)
+					li.className = "active"
 					a.onclick = function() { pageFunc(page) }
 					a.title = "当前页：" + page
-					a.innerHTML = "<span>" + page + "</span>"
+					a.innerHTML = page
 				}
 				else {
 					var temp = data[0]["page_rang"][i]
 					a.onclick = function() { pageFunc(temp) }
 					a.title = data[0]["page_rang"][i]
-					a.innerHTML = "<span>" + data[0]["page_rang"][i] + "</span>"
+					a.innerHTML = data[0]["page_rang"][i]
 				}
-				pageDiv.appendChild(a)
+				li.appendChild(a)
+				pageDiv.appendChild(li)
 			}
 
 			if (data[0]["has_next"]) {
+				var li = document.createElement("li")
 				var a = document.createElement("a")
 				a.onclick = function() { pageFunc(page + 1) }
 				a.title = "下一页"
-				a.innerHTML = "<span>&gt;&gt;</span>"
-				pageDiv.appendChild(a)
+				a.innerHTML = "&gt;&gt;"
+				li.appendChild(a)
+				pageDiv.appendChild(li)
 			}
 		}
 
@@ -412,30 +419,30 @@
 			var sName = ""
 			var sTD
 			for (var i = 0; i < data.length; ++i) {
-				var tr = document.createElement("tr")
+				var currentRows = table.rows.length
+				var tr = table.insertRow(currentRows)
 
-				var idTD = document.createElement("td")
+				var idTD = tr.insertCell(0)
 				idTD.innerHTML = data[i]["pk"]
 				idTD.onclick = function() { currUserID = this; flushOpt(1, this) }
 
-				var ipTD = document.createElement("td")
+				var ipTD = tr.insertCell(1)
 				ipTD.innerHTML = data[i]["fields"]["client_ip"]
 
-				var startTD = document.createElement("td")
+				var startTD = tr.insertCell(2)
 				startTD.innerHTML = convertTimestampToDate(data[i]["fields"]["start_time"])
 
-				var endTD = document.createElement("td")
+				var endTD = tr.insertCell(3)
 				endTD.innerHTML = convertTimestampToDate(data[i]["fields"]["stop_time"])
 
-				var stateTD = document.createElement("td")
+				var stateTD = tr.insertCell(4)
 				if (data[i]["fields"]["exit_code"] == "")
 					stateTD.innerHTML = "-"
 				else
 					stateTD.innerHTML = data[i]["fields"]["exit_code"]
 				
-				var attTd
+				var attTd = tr.insertCell(5)
 				if (data[i]["fields"]["attachment"]) {
-					attTd = document.createElement("a")
 					attTd.href = "download/?id="+idTD.innerHTML
 					attTd.target = '_blank'
 					attTd.innerHTML = "附件"
@@ -443,16 +450,6 @@
 					attTd = document.createElement("td")
 					attTd.innerHTML = "-"
 				}
-
-				tr.appendChild(idTD)
-				tr.appendChild(ipTD)
-				tr.appendChild(startTD)
-				tr.appendChild(endTD)
-				tr.appendChild(stateTD)
-				if (attTd) {
-					tr.appendChild(attTd)
-				}
-				table.appendChild(tr);
 
 				if (i == 0) {
 					sName = idTD.innerHTML
@@ -467,7 +464,7 @@
 		}
 
 		function updateOptList(data) {
-			console.log(data)
+			//console.log(data)
 			var table=document.getElementById("opttable")
 			var rawCount = table.rows.length
 
@@ -483,17 +480,14 @@
 
 			//添加行
 			for (var i = 0; i < data.length; ++i) {
-				var tr = document.createElement("tr")
-				var cmdTD = document.createElement("td")
+				var currentRows = table.rows.length
+				var tr = table.insertRow(currentRows)
+
+				var cmdTD = tr.insertCell(0)
 				cmdTD.innerHTML = data[i]["fields"]["cmd"]
 
-				var timeTD = document.createElement("td")
+				var timeTD = tr.insertCell(1)
 				timeTD.innerHTML = convertTimestampToDate(data[i]["fields"]["time"])
-
-				tr.appendChild(timeTD)
-				tr.appendChild(cmdTD)
-
-				table.appendChild(tr);
 			}
 			updatePage(data, document.getElementById('optpage'))
 		}
@@ -547,9 +541,17 @@
 			var dumpList = []
 			var successList = []
 			for (var i = 0; i < chartData.length; ++i) {
-				xList.push(chartData[i].datetime.split(' ')[0])
-				dumpList.push(chartData[i].dumpNum)
-				successList.push(chartData[i].successNum)
+				var dt = convertTimestampToDay(chartData[i].datetime)
+				var index = $.inArray(dt, xList)
+				if (index < 0) {
+					xList.push(convertTimestampToDay(chartData[i].datetime))
+					dumpList.push(chartData[i].dumpNum)
+					successList.push(chartData[i].successNum)
+				}else {
+					dumpList[index] += chartData[i].dumpNum;
+					successList[index] += chartData[i].successNum;
+				}
+				
 			}
 
 			chart = new Highcharts.Chart({  
@@ -607,6 +609,7 @@
 		}
 
 		function flushUser(currPage, obj) {
+			console.log(currPage)
 			if (obj) {
 				currEditor = obj
 			}
@@ -674,6 +677,16 @@
 			var newDate = new Date()
 			newDate.setTime(timestamp * 1000)
 			return newDate.toLocaleString()
+		}
+
+		function convertTimestampToDay(timestamp) {
+			if (timestamp == 0) {
+				return "Invaild Date"
+			}
+
+			var newDate = new Date()
+			newDate.setTime(timestamp * 1000)
+			return newDate.toLocaleDateString()
 		}
 
 	</script>
