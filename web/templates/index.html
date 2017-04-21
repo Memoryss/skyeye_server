@@ -334,7 +334,6 @@
 		}
 
 		function updatePage(data, obj) {
-			//console.log(data)
 			if ($.isEmptyObject(data) || data.length <= 0) {
 				obj.innerHTML = ""
 				return
@@ -346,8 +345,6 @@
 				page = currNamePage
 				pageFunc = flushName
 			}else if(obj.id == "userpage") {
-				console.log("currUserpage:"+currUserPage)
-				console.log("rang:"+data[0]["page_rang"])
 				page = currUserPage	
 				pageFunc = flushUser
 			}else {
@@ -371,15 +368,13 @@
 				var li = document.createElement("li")
 				var a = document.createElement("a")
 				if (data[0]["page_rang"][i] == page) {
-					console.log("ttt"+page)
 					li.className = "active"
 					a.onclick = function() { pageFunc(page) }
 					a.title = "当前页：" + page
 					a.innerHTML = page
 				}
 				else {
-					var temp = data[0]["page_rang"][i]
-					a.onclick = function() { pageFunc(temp) }
+					a.onclick = function() { pageFunc(this.innerHTML) }
 					a.title = data[0]["page_rang"][i]
 					a.innerHTML = data[0]["page_rang"][i]
 				}
@@ -464,7 +459,6 @@
 		}
 
 		function updateOptList(data) {
-			//console.log(data)
 			var table=document.getElementById("opttable")
 			var rawCount = table.rows.length
 
@@ -609,7 +603,6 @@
 		}
 
 		function flushUser(currPage, obj) {
-			console.log(currPage)
 			if (obj) {
 				currEditor = obj
 			}
