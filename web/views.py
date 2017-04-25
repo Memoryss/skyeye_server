@@ -165,7 +165,7 @@ class Search(object):
             j[0]['has_next'] = opt.has_next()
             j[0]['page_rang'] = opt.paginator.page_range_ext
         return HttpResponse(json.dumps(j))
-
+    '''
     @staticmethod
     def searchAllChart(request):
         editorName = SQL.getAllEditorName()
@@ -175,7 +175,8 @@ class Search(object):
             print data_json
             editorData[editor["name"]] = data_json
         return HttpResponse(json.dumps(editorData))
-
+    '''
+    
     @staticmethod
     def searchDetailChart(request):
         editorName = SQL.getAllEditorName()
@@ -186,7 +187,12 @@ class Search(object):
             data = []
             success = []
             dump = []
-            days = SQL.getDetailTimes(editor["name"], success, dump)
+            obj = None
+            if request.GET.get('starttime') != None:
+                obj = SQL.getEditorUserByTime(request.GET.get('starttime'), request.GET.get('endtime'), editor["name"])
+            days = SQL.getDetailTimes(editor["name"], success, dump, obj)
+            if len(days) <= 0:
+                continue
             data.append(days)
             data.append(success)
             data.append(dump)
@@ -196,7 +202,6 @@ class Search(object):
     
     @staticmethod
     def searchTimes(request):
-        Search.searchIPTimes(request)
         editorName = SQL.getAllEditorName()
         editorData = {}
         editorTimes = {}
@@ -204,17 +209,27 @@ class Search(object):
             for editor in editorName:
                 if editor["name"] == "":
                     continue
-                editorTimes[editor["name"]] = SQL.getAllTimes(editor["name"])
+
+                obj = None
+                if request.GET.get('starttime') != None:
+                    obj = SQL.getEditorUserByTime(request.GET.get('starttime'), request.GET.get('endtime'), editor["name"])
+                editorTimes[editor["name"]] = SQL.getAllTimes(editor["name"], obj)
         elif request.GET.get('type') == "success":
             for editor in editorName:
                 if editor["name"] == "":
                     continue
-                editorTimes[editor["name"]] = SQL.getSuccessTimes(editor["name"])
+                obj = None
+                if request.GET.get('starttime') != None:
+                    obj = SQL.getEditorUserByTime(request.GET.get('starttime'), request.GET.get('endtime'), editor["name"])
+                editorTimes[editor["name"]] = SQL.getSuccessTimes(editor["name"], obj)
         else:
             for editor in editorName:
                 if editor["name"] == "":
                     continue
-                editorTimes[editor["name"]] = SQL.getDumpTimes(editor["name"])
+                obj = None
+                if request.GET.get('starttime') != None:
+                    obj = SQL.getEditorUserByTime(request.GET.get('starttime'), request.GET.get('endtime'), editor["name"])
+                editorTimes[editor["name"]] = SQL.getDumpTimes(editor["name"], obj)
         #editorTimes_sort = sorted(editorTimes.items(), key=operator.itemgetter(1))
         #print editorTimes_sort
         editor_json = json.dumps(editorTimes)

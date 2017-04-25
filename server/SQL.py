@@ -143,14 +143,14 @@ class SQL(object):
             
     @staticmethod
     def getEditorNameByTime(starttime, endtime, currPage):
-        startDate = time.mktime(datetime.datetime.strptime(starttime + "-0", '%Y-%m-%d-%H').timetuple())
-        endDate = time.mktime(datetime.datetime.strptime(endtime + "-23-59", '%Y-%m-%d-%H-%M').timetuple())
+        startDate = time.mktime(time.strptime(starttime + "-0", '%Y-%m-%d-%H')) - time.timezone
+        endDate = time.mktime(time.strptime(endtime + "-23-59", '%Y-%m-%d-%H-%M')) - time.timezone
         return SQL.paging(SQL.getAllEditor().filter(start_time__range=(startDate, endDate)).values('name').distinct(), 20, currPage)
          
     @staticmethod
     def getEditorUserByTime(starttime, endtime, editorname, currPage = None):
-        startDate = time.mktime(datetime.datetime.strptime(starttime + "-0", '%Y-%m-%d-%H').timetuple())
-        endDate = time.mktime(datetime.datetime.strptime(endtime + "-23-59", '%Y-%m-%d-%H-%M').timetuple())
+        startDate = time.mktime(time.strptime(starttime + "-0", '%Y-%m-%d-%H')) - time.timezone
+        endDate = time.mktime(time.strptime(endtime + "-23-59", '%Y-%m-%d-%H-%M')) - time.timezone
         if currPage == None:
             return SQL.getAllEditor().filter(Q(start_time__range=(startDate, endDate)), Q(name=editorname))
         else:
@@ -172,8 +172,10 @@ class SQL(object):
         return temp
 
     @staticmethod
-    def getDetailTimes(name, success, dump):
-        obj = SQL.getAllEditorUserByName(name)
+    def getDetailTimes(name, success, dump, obj = None):
+        #print obj
+        if obj == None:
+            obj = SQL.getAllEditorUserByName(name)
         days = getDays(obj.values('start_time').distinct())
         for day in days:
             success.append(obj.filter(Q(start_time__gte=day, start_time__lte=day+86400), Q(exit_code="0")).count())
@@ -181,18 +183,21 @@ class SQL(object):
         return days
     
     @staticmethod
-    def getAllTimes(name):
-        obj = SQL.getAllEditorUserByName(name)
+    def getAllTimes(name, obj=None):
+        if obj == None:
+            obj = SQL.getAllEditorUserByName(name)
         return obj.count()
-    
+
     @staticmethod
-    def getSuccessTimes(name):
-        obj = SQL.getAllEditorUserByName(name)
+    def getSuccessTimes(name, obj=None):
+        if obj == None:
+            obj = SQL.getAllEditorUserByName(name)
         return obj.filter(exit_code="0").count()
 
     @staticmethod
-    def getDumpTimes(name):
-        obj = SQL.getAllEditorUserByName(name)
+    def getDumpTimes(name, obj=None):
+        if obj == None:
+            obj = SQL.getAllEditorUserByName(name)
         return obj.exclude(exit_code="0").count()
     
     @staticmethod
@@ -200,7 +205,7 @@ class SQL(object):
         obj = SQL.getAllEditor().values("client_ip").annotate(ip_times=Count('client_ip')).all().order_by('-ip_times')
         if len(obj) <= 0:
             return
-        ip = obj[0]["client_ip"]
+        ip = obj[0]["client_ip"] 
         obj = SQL.getAllEditor().filter(client_ip=ip).values("name", "client_ip").annotate(times=Count('name')).all().order_by('-times')
         return obj
 
