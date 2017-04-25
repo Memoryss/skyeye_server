@@ -8,8 +8,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.serializers import serialize
+from django.db.models import Q
 import logging
 import json
+import operator
 
 from server.SQL import *
 
@@ -64,7 +66,7 @@ class Show(object):
             eid = editorUser[0].id
             currPage = (request.GET.get('optpage') and request.GET.get('optpage') or 1)
             opt = Show.initOpt(eid, currPage)
-
+        print ename
         return render(request, 'index.html', {'eidtorname':editorName, 'editorUser':editorUser, 'opt':opt, 'ename':ename, 'eid':eid})
 
     @staticmethod
@@ -79,18 +81,21 @@ class Show(object):
     @staticmethod
     def initName(currPage):
         logger.debug("namepage:" + str(currPage))
-        return SQL.paging(SQL.getAllEditor().values('name').distinct(), 5, currPage)
+        return SQL.paging(SQL.getAllEditor().values('name').distinct(), 20, currPage)
     
     @staticmethod
     def initUser(editorname, currPage):
         logger.debug("userpage:" + str(currPage))
-        return SQL.paging(SQL.getAllEditor().filter(name=editorname), 5, currPage)
+        return SQL.paging(SQL.getAllEditor().filter(name=editorname), 20, currPage)
     
     @staticmethod
     def initOpt(id, currPage):
         logger.debug("optpage:" + str(currPage))
-        return SQL.paging(SQL.getEditorOpt(id), 5, currPage)
+        return SQL.paging(SQL.getEditorOpt(id), 20, currPage)
 
+    @staticmethod
+    def chart(request):
+        return render(request, 'chart.html')
 
 class Search(object):
 
@@ -160,6 +165,68 @@ class Search(object):
             j[0]['has_next'] = opt.has_next()
             j[0]['page_rang'] = opt.paginator.page_range_ext
         return HttpResponse(json.dumps(j))
+
+    @staticmethod
+    def searchAllChart(request):
+        editorName = SQL.getAllEditorName()
+        editorData = {}
+        for editor in editorName:
+            data_json = serialize("json", SQL.getAllEditorUserByName(editor["name"]), cls=DjangoOverRideJSONEncoder, fields=('start_time', 'exit_code'))
+            print data_json
+            editorData[editor["name"]] = data_json
+        return HttpResponse(json.dumps(editorData))
+
+    @staticmethod
+    def searchDetailChart(request):
+        editorName = SQL.getAllEditorName()
+        editorData = {}
+        for editor in editorName:
+            if editor["name"] == "":
+                continue
+            data = []
+            success = []
+            dump = []
+            days = SQL.getDetailTimes(editor["name"], success, dump)
+            data.append(days)
+            data.append(success)
+            data.append(dump)
+            editorData[editor["name"]] = data
+        editor_json = json.dumps(editorData)
+        return HttpResponse(editor_json)
+    
+    @staticmethod
+    def searchTimes(request):
+        Search.searchIPTimes(request)
+        editorName = SQL.getAllEditorName()
+        editorData = {}
+        editorTimes = {}
+        if request.GET.get('type') == "total":
+            for editor in editorName:
+                if editor["name"] == "":
+                    continue
+                editorTimes[editor["name"]] = SQL.getAllTimes(editor["name"])
+        elif request.GET.get('type') == "success":
+            for editor in editorName:
+                if editor["name"] == "":
+                    continue
+                editorTimes[editor["name"]] = SQL.getSuccessTimes(editor["name"])
+        else:
+            for editor in editorName:
+                if editor["name"] == "":
+                    continue
+                editorTimes[editor["name"]] = SQL.getDumpTimes(editor["name"])
+        #editorTimes_sort = sorted(editorTimes.items(), key=operator.itemgetter(1))
+        #print editorTimes_sort
+        editor_json = json.dumps(editorTimes)
+        return HttpResponse(editor_json)
+    
+    @staticmethod
+    def searchIPTimes(request):
+        obj = SQL.getMaxIPTimes()
+        if obj == None:
+            return json.dumps({})
+        data_json = json.dumps(list(obj))
+        return HttpResponse(data_json)
 
 def get_file_names(directory, parentdir):
     contents = os.listdir(directory)

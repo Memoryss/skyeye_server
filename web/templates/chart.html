@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block content %}
+
+<br>
+<ul class="nav nav-pills">
+  <li id="totalChart" class="active"><a href="javascript:void(0);" onclick="updateType(this)">total</a></li>
+  <li id="successChart"><a href="javascript:void(0);" onclick="updateType(this)">success</a></li>
+  <li id="dumpChart"><a href="javascript:void(0);" onclick="updateType(this)">dump</a></li>
+</ul>
+
+<div id="chart"></div>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+<div id="coutChart"></div>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+<div id="ipChart"></div>
+<script language="javascript" type="text/javascript">
+
+    var starturl = window.location.host
+
+    $.getJSON("http://" + starturl + "/searchDetailChart/", updateChartData)
+
+    var names = []
+    var xLists = []
+    var ySuccessLists = []
+    var yDumpLists = []
+
+    var chartType = "total"
+
+    var chart = new Highcharts.Chart({
+            chart: {  
+                renderTo: 'chart',  
+                type: 'line',
+            },  
+            title:{  
+                text: chartType
+            },
+            xAxis: {
+            type: 'datetime',
+            dateTimeLabelFormats: {
+                day: '%m-%d',
+                week: '%m-%d',
+                month: '%Y-%m',
+                year: '%Y'
+            }
+            },
+            tooltip: {
+                dateTimeLabelFormats: {
+                   
+                    day: '%Y-%m-%d',
+                    week: '%m-%d',
+                    month: '%Y-%m',
+                    year: '%Y'
+                },/*
+                formatter: function() {
+                    return '<b>'+ this.series.name +'</b>:   '+Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x)+'<br/>total: '+ (ySuccessLists[this.series.index][this.series.data.indexOf(this.point)] + yDumpLists[this.series.index][this.series.data.indexOf(this.point)])+'<br/>success: '+ ySuccessLists[this.series.index][this.series.data.indexOf(this.point)]+'<br/>dump: '+ yDumpLists[this.series.index][this.series.data.indexOf(this.point)];  
+                }*/
+            },
+            yAxis:{  
+                title:{  
+                    enabled: true,  
+                    text: '次数'  
+                }  
+            },
+	});
+
+    var countChart = new Highcharts.Chart({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: 0,
+            plotShadow: false,
+            renderTo: 'coutChart',  
+            type: 'pie',
+        },
+        title: {
+            text: '编辑器使用量',
+            align: 'center',
+            verticalAlign: 'middle',
+            y: 50
+        },
+        series: [{
+            type: 'pie',
+            name: '使用量',
+        }],
+    });
+
+    var ipChart = new Highcharts.Chart({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: 0,
+            plotShadow: false,
+            renderTo: 'ipChart',  
+            type: 'pie',
+        },
+        title: {
+            text: '使用量最多的ip',
+            align: 'center',
+            verticalAlign: 'middle',
+            y: 50
+        },
+        series: [{
+            type: 'pie',
+            name: '使用量',
+        }],
+    });
+
+    function updateType(obj) {
+        if (obj.innerHTML == "total") {
+            chartType = "total"
+        }
+        else if(obj.innerHTML == "success") {
+            chartType = "success"
+        }else {
+            chartType = "dump"
+        }
+        updateNAV()
+        updateChart()
+    }
+
+    function updateNAV() {
+        if (chartType == "total") {
+              document.getElementById("successChart").className = ""
+              document.getElementById("dumpChart").className = ""
+              document.getElementById("totalChart").className = "active"
+        }else if(chartType == "success"){
+              document.getElementById("totalChart").className = ""
+              document.getElementById("successChart").className = "active"
+              document.getElementById("dumpChart").className = ""
+        }else {
+              document.getElementById("totalChart").className = ""
+              document.getElementById("successChart").className = ""
+              document.getElementById("dumpChart").className = "active"
+        }
+    }
+
+    function updateChartData(data) {
+        if ($.isEmptyObject(data) || data.length <= 0) {
+				return
+		}
+
+         //填充数据
+        for (var key in data) {
+            var editorData = data[key]
+            var xList = editorData[0]
+            var ySuccessList = editorData[1]
+            var yDumpList = editorData[2]
+          
+            names.push(key)
+            xLists.push(xList)
+            ySuccessLists.push(ySuccessList)
+            yDumpLists.push(yDumpList)
+        }
+        updateChart()
+    }
+
+    function updateChart() {
+        Highcharts.setOptions({
+            global: {
+                timezoneOffset: -8 * 60
+            }
+        });
+
+        for (var j = 0; j < yDumpLists.length; ++j) {
+            ySuccessList = ySuccessLists[j]
+            yDumpList = yDumpLists[j]
+            xList = xLists[j]
+            key = names[j]
+
+            var serierData = []
+            if (chartType == "total") {
+                chart.setTitle( {text: "total(编辑器个数:" + xLists.length + ")"})
+                for (var i = 0; i < xList.length; ++i) {
+                    serierData.push([xList[i] * 1000, ySuccessList[i] + yDumpList[i]])
+                }
+            }else if (chartType == "success") {
+                chart.setTitle( {text: "success(编辑器个数:" + xLists.length + ")"})
+                for (var i = 0; i < xList.length; ++i) {
+                    serierData.push([xList[i] * 1000, ySuccessList[i]])
+                }
+            }else {
+                chart.setTitle( {text: "dump(编辑器个数:" + xLists.length + ")"})
+                for (var i = 0; i < xList.length; ++i) {
+                    serierData.push([xList[i] * 1000, yDumpList[i]])
+                }
+            }
+
+            if ($.isEmptyObject(chart.series[j])) {
+                chart.addSeries({name:key, data:serierData}, false)
+            }else {
+                chart.series[j].update({name:key, 
+                    data: serierData
+                }, false)
+            }
+        }
+        chart.redraw()
+
+        updateCountChart(chartType)
+        updateIPChart()
+    }
+    
+    function updateCountChart(type) {
+        $.getJSON("http://" + starturl + "/searchTimes/?type="+type, function (data) {
+            var sortable = []
+            for (var vehicle in data) {
+                sortable.push([vehicle, data[vehicle]])
+            }
+
+            sortable.sort(function(a, b) {
+                return a[1] - b[1]
+            });
+
+            var size = sortable.length
+            seriesData = [
+                [sortable[0][0], sortable[0][1]],
+                [sortable[1][0], sortable[1][1]],
+                [sortable[2][0], sortable[2][1]],
+                [sortable[size-3][0], sortable[size-3][1]],
+                [sortable[size-2][0], sortable[size-2][1]],
+                [sortable[size-1][0], sortable[size-1][1]],
+            ]
+            countChart.series[0].setData(seriesData)
+        })
+    }
+
+    function updateIPChart() {
+        $.getJSON("http://" + starturl + "/searchIPTimes/", function (data) {
+            if (data.length <= 0) {
+                return
+            }
+
+            ipChart.setTitle( {text: "使用量最多的ip:" + data[0]["client_ip"]})
+            var seriesData = []
+            for (var i = 0; i < data.length; ++i) {
+                seriesData.push([data[i]["name"], data[i]["times"]])
+            }
+            
+            ipChart.series[0].setData(seriesData)
+        })
+    }
+    
+</script>
+
+{% endblock %}
