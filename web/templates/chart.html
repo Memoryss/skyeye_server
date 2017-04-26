@@ -1,21 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
 
-<fieldset class="cont">
-	<h1 >搜索</h1>
-	<div class="list">
-		<label class="help-block"><s>*</s>查询方式:</label>
-		<select size="1" name="D1" onChange="javascript:queryData('mune_x'+this.value)">
-            <option value="1">无</option>
+<div class="row placeholders">
+	<h2 class="sub-header">搜索</h1>
+	<div class="col-xs-6 col-sm-1 placeholder text-center">
+		<label>查询方式:</label>
+		<select class="form-control" size="1" name="D1" onChange="javascript:queryData('mune_x'+this.value)">
+			<option value="1">无</option>
             <option value="2">时间</option>
-		</select> 
+		</select>
+	</div>
+	<div class="col-xs-6 col-sm-2 placeholder text-center">
 	</div>
 
-    <div id="x1">
-	
+	<div class="col-xs-6 col-sm-4 placeholder" id="x1">
 	</div>
+
 	<!-------------------------------时间-------------------------------------->
-	<div class="list" id="x2" style="display:none">
+	<div class="col-xs-6 col-sm-4 placeholder" id="x2" style="display:none">
 		<div id="dCon2">
 			开始时间：2017-04-14
 			<br/>
@@ -53,21 +55,24 @@
 		</script>
 		<br/>
 	</div>
-	<div class="list">
+
+	<div class="col-xs-6 col-sm-1 placeholder text-center">
 		<button id="directNextpage" class="btn" onclick="flushChart()">搜索</button>  
 	</div>
-</fieldset>
-
-<h1>图表</h1>
-<br>
-<ul class="nav nav-pills">
-  <li id="totalChart" class="active"><a href="javascript:void(0);" onclick="updateType(this)">total</a></li>
-  <li id="successChart"><a href="javascript:void(0);" onclick="updateType(this)">success</a></li>
-  <li id="dumpChart"><a href="javascript:void(0);" onclick="updateType(this)">dump</a></li>
-</ul>
-<div id="chart"></div>
-<div id="coutChart"></div>
-<div id="ipChart"></div>
+</div>
+<hr>
+<div class="row placeholders">
+    <h2 class="sub-header">图表</h1>
+    <ul class="nav nav-pills">
+        <li id="totalChart" class="active"><a href="javascript:void(0);" onclick="updateType(this)">total</a></li>
+        <li id="successChart"><a href="javascript:void(0);" onclick="updateType(this)">success</a></li>
+        <li id="dumpChart"><a href="javascript:void(0);" onclick="updateType(this)">dump</a></li>
+    </ul>
+    <div style="float:left ;  width:50%;" id="coutChart"></div>
+    <div style="float:left ;  width:50%;" id="ipChart"></div>
+    
+    <div id="chart" style="margin-top:0px;"></div>
+</div>
 <script language="javascript" type="text/javascript">
 
     var starturl = window.location.host
@@ -210,7 +215,7 @@
     }
 
     function updateChartData(data) {
-        console.log(data)
+        //console.log(data)
         names = []
         xLists = []
         ySuccessLists = []
@@ -331,7 +336,7 @@
             param = "?starttime=" + starttime + "&endtime=" + endtime
         }
         $.getJSON("http://" + starturl + "/searchIPTimes/" + param, function (data) {
-            console.log(data)
+            //console.log(data)
             if ($.isEmptyObject(data) || data.length <= 0) {
                 ipChart.series[0].setData([])
                 return

@@ -16,7 +16,7 @@ import time
 
 #分页
 class JuncheePaginator(Paginator):
-      def __init__(self, object_list, per_page, range_num=20, orphans=0, allow_empty_first_page=True):
+      def __init__(self, object_list, per_page, range_num=5, orphans=0, allow_empty_first_page=True):
           Paginator.__init__(self, object_list, per_page, orphans, allow_empty_first_page)
           self.range_num = range_num
   
@@ -87,7 +87,7 @@ class SQL(object):
         
     @staticmethod
     def getAllEditor():
-        return Editor.objects.all()
+        return Editor.objects.all().exclude(name="")
     
     @staticmethod
     def getEditorOpt(sessionid):

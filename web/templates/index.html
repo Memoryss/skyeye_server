@@ -1,25 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
-<body>
-	<fieldset class="cont">
-	<h1 >搜索</h1>
-	<div class="list">
-		<label class="help-block"><s>*</s>查询方式:</label>
-		<select size="1" name="D1" onChange="javascript:queryData('mune_x'+this.value)">  
+
+<div class="row placeholders">
+	<h2 class="sub-header">搜索</h1>
+	<div class="col-xs-6 col-sm-1 placeholder text-center">
+		<label>查询方式:</label>
+		<select class="form-control" size="1" name="D1" onChange="javascript:queryData('mune_x'+this.value)">
 			<option value="1">ip</option> 
 			<option value="2">时间</option> 
 			<option value="3">是否dump</option>
-		</select> 
+		</select>
 	</div>
-
+	<div class="col-xs-6 col-sm-2 placeholder text-center">
+	</div>
 	<!-------------------------------ip-------------------------------------->
-	<div class="list" id="x1">
-		<label class="help-block"><s>*</s>ip:</label>
+	<div class="col-xs-6 col-sm-4 placeholder" id="x1">
+		</br>
+		<label>ip:</label>
 		<input type="text" value="" name="ip" placeholder="请输入要查询的ip">
 	</div>
 
 	<!-------------------------------时间-------------------------------------->
-	<div class="list" id="x2" style="display:none">
+	<div class="col-xs-6 col-sm-4 placeholder" id="x2" style="display:none">
 		<div id="dCon2">
 			开始时间：2017-04-14
 			<br/>
@@ -58,69 +60,83 @@
 		<br/>
 	</div>
 	<!-------------------------------dump-------------------------------------->
-	<div class="list" id="x3" style="display:none">
-		<label class="help-block"><s>*</s>dump:</label>
+	<div class="col-xs-6 col-sm-4 placeholder" id="x3" style="display:none">
+		</br>
+		<label>dump:</label>
 		<select size="1" name="dump">  
 			<option value="1">是</option> 
 			<option value="0">否</option> 
 		</select> 
 	</div>
-	<div class="list">
+	<div class="col-xs-6 col-sm-1 placeholder text-center">
 		<button id="directNextpage" class="btn" onclick="flushName(1)">搜索</button>  
 	</div>
-</fieldset>
-	<div class="main">
-		<h1>详细信息</h1>
-		<!-- 编辑器的列表 -->
-		<div class="first-div" align="center">
-			<h2>编辑器列表</h2>
-			<br/>
-			<table id="editortable" class="table table-striped table-bordered">
-				<thread>
-					<tr>
-						<th align="left">名称</th>
-					</tr>
-				</thread>
-				{% for editor in eidtorname %}
-					{% ifequal editor.name ename.name %}
-						<tr class="success"><td onclick="flushUser(1, this)">{{ editor.name }}</td></tr>
-					{% else %}
-						<tr><td onclick="flushUser(1, this)">{{ editor.name }}</td></tr>
-					{% endifequal %}
-				{% endfor %}
-			</table>
-			<ul id="namepage" class="pagination">
-				{% if eidtorname.has_previous %}
-					<li><a title='上一页' onclick="flushName('{{eidtorname.previous_page_number }}')">&lt;&lt;</a></li>
+</div>
+
+<hr>
+<div class="row placeholders">
+	<h1>详细信息</h1>
+	<div class="col-xs-6 col-sm-2 placeholder">
+		<h3 class="sub-header">编辑器列表</h2>
+		<ul id="namepage" class="pagination">
+			{% if eidtorname.has_previous %}
+				<li><a title='上一页' onclick="flushName('{{eidtorname.previous_page_number }}')">&lt;&lt;</a></li>
+			{% endif %}
+			{% for page in eidtorname.paginator.page_range_ext %}
+				{% if page == eidtorname.number %}
+					<li class="active"><a onclick="flushName('{{ page }}')" title='当前页:{{ page }}'>{{ page }}</a></li>
+				{% else %}
+					<li><a  onclick="flushName('{{ page }}')" title='{{ page }}'>{{ page }}</a></li>
 				{% endif %}
-				{% for page in eidtorname.paginator.page_range_ext %}
-					{% if page == eidtorname.number %}
-						<li class="active"><a onclick="flushName('{{ page }}')" title='当前页:{{ page }}'>{{ page }}</a></li>
-					{% else %}
-						<li><a  onclick="flushName('{{ page }}')" title='{{ page }}'>{{ page }}</a></li>
-					{% endif %}
-				{% endfor %}
-				{% if eidtorname.has_next %}
-					<li><a title='下一页' onclick="flushName('{{eidtorname.next_page_number }}')">&gt;&gt;</a></li>
+			{% endfor %}
+			{% if eidtorname.has_next %}
+				<li><a title='下一页' onclick="flushName('{{eidtorname.next_page_number }}')">&gt;&gt;</a></li>
+			{% endif %}
+		</ul>
+		<table class="table table-striped table-bordered" id="editortable">
+			<thread>
+				<tr>
+					<th align="left">名称</th>
+				</tr>
+			</thread>
+			{% for editor in eidtorname %}
+				{% ifequal editor.name ename.name %}
+					<tr class="success"><td onclick="flushUser(1, this)">{{ editor.name }}</td></tr>
+				{% else %}
+					<tr><td onclick="flushUser(1, this)">{{ editor.name }}</td></tr>
+				{% endifequal %}
+			{% endfor %}
+		</table>
+	</div>
+	<div class="col-xs-6 col-sm-6 placeholder">
+		<h3 class="sub-header">使用情况</h2>
+		<ul id="userpage" class="pagination">
+			{% if editorUser.has_previous %}
+				<li><a title='上一页' onclick="flushUser('{{ editorUser.previous_page_number }}')">&lt;&lt;</a></li>
+			{% endif %}
+			{% for page in editorUser.paginator.page_range_ext %}
+				{% if page == editorUser.number %}
+					<li class="active"><a onclick="flushUser('{{ page }}')" title='当前页:{{ page }}'>{{ page }}</a></li>
+				{% else %}
+					<li><a onclick="flushUser('{{ page }}')" title='{{ page }}'>{{ page }}</a></li>
 				{% endif %}
-			</ul>
-		</div>
-		<!-- 编辑器的详细信息 -->
-		<div class="second-div" align="center">
-			<h2>使用情况</h2>
-			<br/>
-			<table id="usertable" class="table table-striped table-bordered">
-				<thread>
-					<tr align="left">
-						<th>ID</th>
-						<th>IP</th>
-						<th>开始时间</th>
-						<th>结束时间</th>
-						<th>退出状态</th>
-						<th>附件</th>
-					</tr>
-				</thread>
-				{% for editor in editorUser %}
+			{% endfor %}
+			{% if editorUser.has_next %}
+				<li><a title='下一页' onclick="flushUser('{{ editorUser.next_page_number }}')">&gt;&gt;</a></li>
+			{% endif %}
+		</ul>
+		<table class="table table-striped table-bordered" id="usertable">
+			<thread>
+				<tr align="left">
+					<th>ID</th>
+					<th>IP</th>
+					<th>开始时间</th>
+					<th>结束时间</th>
+					<th>退出状态</th>
+					<th>附件</th>
+				</tr>
+			</thread>
+			{% for editor in editorUser %}
 				<tr>
 					{% ifequal editor.id eid %}
 						<td onclick="flushOpt( 1, this )" >{{ editor.id }}</td>
@@ -135,69 +151,50 @@
 						<a href="download/">附件</a>
 					{% endifequal %}
 				</tr>
-				{% endfor %}
-			</table>
-			<ul id="userpage" class="pagination">
-				{% if editorUser.has_previous %}
-					<li><a title='上一页' onclick="flushUser('{{ editorUser.previous_page_number }}')">&lt;&lt;</a></li>
+			{% endfor %}
+		</table>
+	</div>
+	<div class="col-xs-6 col-sm-4 placeholder">
+		<h3 class="sub-header">操作列表</h2>
+		<ul id="optpage" class="pagination">
+			{% if opt.has_previous %}
+				<li><a title='上一页' onclick="flushOpt('{{ opt.previous_page_number }}')">&lt;&lt;</a></li>
+			{% endif %}
+			{% for page in opt.paginator.page_range_ext %}
+				{% if page == opt.number %}
+					<li class="active"><a onclick="flushOpt('{{ page }}')" title='当前页:{{ page }}'>{{ page }}</a></li>
+				{% else %}
+					<li><a onclick="flushOpt('{{ page }}')" title='{{ page }}'>{{ page }}</a></li>
 				{% endif %}
-				{% for page in editorUser.paginator.page_range_ext %}
-					{% if page == editorUser.number %}
-						<li class="active"><a onclick="flushUser('{{ page }}')" title='当前页:{{ page }}'>{{ page }}</a></li>
-					{% else %}
-						<li><a onclick="flushUser('{{ page }}')" title='{{ page }}'>{{ page }}</a></li>
-					{% endif %}
-				{% endfor %}
-				{% if editorUser.has_next %}
-					<li><a title='下一页' onclick="flushUser('{{ editorUser.next_page_number }}')">&gt;&gt;</a></li>
-				{% endif %}
-			</ul>
-		</div>
-		<!-- 编辑器的操作 -->
-		<div class="third-div" align="center">
-			<h2>操作列表</h2>
-			<br/>
-			<table id="opttable" class="table table-striped  table-bordered">
-				<thread>
-					<tr>
-						<th>时间</th>
-						<th>操作</th>
-					</tr>
-				</thread>
-				{% for o in opt %}
+			{% endfor %}
+			{% if opt.has_next %}
+				<li><a title='下一页' onclick="flushOpt('{{ opt.next_page_number }}')">&gt;&gt;</a></li>
+			{% endif %}
+		</ul>
+		<table class="table table-striped table-bordered" id="opttable">
+			<thread>
+				<tr>
+					<th>时间</th>
+					<th>操作</th>
+				</tr>
+			</thread>
+			{% for o in opt %}
 				<tr>
 					<td>{{ o.time }}</td>
 					<td>{{ o.cmd }}</td>
 				</tr>
-				{% endfor %}
-			</table>
-			<ul id="optpage" class="pagination">
-				{% if opt.has_previous %}
-					<li><a title='上一页' onclick="flushOpt('{{ opt.previous_page_number }}')">&lt;&lt;</a></li>
-				{% endif %}
-				{% for page in opt.paginator.page_range_ext %}
-					{% if page == opt.number %}
-						<li class="active"><a onclick="flushOpt('{{ page }}')" title='当前页:{{ page }}'>{{ page }}</a></li>
-					{% else %}
-						<li><a onclick="flushOpt('{{ page }}')" title='{{ page }}'>{{ page }}</a></li>
-					{% endif %}
-				{% endfor %}
-				{% if opt.has_next %}
-					<li><a title='下一页' onclick="flushOpt('{{ opt.next_page_number }}')">&gt;&gt;</a></li>
-				{% endif %}
-			</ul>
-		</div>
-		
-
+			{% endfor %}
+		</table>
 	</div>
-
-	<!-------------------------------图表-------------------------------------->
+</div>
+<hr>
+<div class="row placeholders">
 	<div class="chart">
 		<h1>图表</h1>
 		<div id="chart"></div>
 	</div>
-
-	<script>
+</div>
+<script>
 		var url = window.location.host
 		var searchType = 0
 		var ip = ""
@@ -621,5 +618,4 @@
 		}
 
 	</script>
-</body>
 {% endblock %}
