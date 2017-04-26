@@ -237,10 +237,13 @@ class Search(object):
     
     @staticmethod
     def searchIPTimes(request):
-        obj = SQL.getMaxIPTimes()
-        if obj == None:
-            return json.dumps({})
-        data_json = json.dumps(list(obj))
+        obj = None
+        if request.GET.get('starttime') != None:
+            obj = SQL.getEditorByTime(request.GET.get('starttime'), request.GET.get('endtime'))
+        ipObj = SQL.getMaxIPTimes(obj)
+        if ipObj == None:
+            return HttpResponse(json.dumps({}))
+        data_json = json.dumps(list(ipObj))
         return HttpResponse(data_json)
 
 def get_file_names(directory, parentdir):

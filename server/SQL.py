@@ -107,7 +107,7 @@ class SQL(object):
         if currPage == None:
             return SQL.getAllEditor().filter(name=editorname)
         else:
-            return SQL.paging(SQL.getAllEditor().filter(name=editorname), 20, currPage)
+            return SQL.paging(SQL.getAllEditor().filter(name=editorname).order_by('-start_time'), 20, currPage)
 
     @staticmethod
     def getEditorNameByIP(clientIP, currPage):
@@ -119,7 +119,7 @@ class SQL(object):
         if currPage == None:
             return SQL.getAllEditor().filter(Q(client_ip=clientIP), Q(name=editorname))
         else:
-            return SQL.paging(SQL.getAllEditor().filter(Q(client_ip=clientIP), Q(name=editorname)), 20, currPage)
+            return SQL.paging(SQL.getAllEditor().filter(Q(client_ip=clientIP), Q(name=editorname)).order_by('-start_time'), 20, currPage)
 
     @staticmethod
     def getEditorNameByDump(dump, currPage):
@@ -137,16 +137,22 @@ class SQL(object):
                 return SQL.getAllEditor().filter(~Q(exit_code="0"), Q(name=editorname))
         else:
             if dump == "0":
-                return SQL.paging(SQL.getAllEditor().filter(Q(exit_code="0"), Q(name=editorname)), 20, currPage)
+                return SQL.paging(SQL.getAllEditor().filter(Q(exit_code="0"), Q(name=editorname)).order_by('-start_time'), 20, currPage)
             else:
-                return SQL.paging(SQL.getAllEditor().filter(~Q(exit_code="0"), Q(name=editorname)), 20, currPage)
+                return SQL.paging(SQL.getAllEditor().filter(~Q(exit_code="0"), Q(name=editorname)).order_by('-start_time'), 20, currPage)
             
     @staticmethod
     def getEditorNameByTime(starttime, endtime, currPage):
         startDate = time.mktime(time.strptime(starttime + "-0", '%Y-%m-%d-%H')) - time.timezone
         endDate = time.mktime(time.strptime(endtime + "-23-59", '%Y-%m-%d-%H-%M')) - time.timezone
         return SQL.paging(SQL.getAllEditor().filter(start_time__range=(startDate, endDate)).values('name').distinct(), 20, currPage)
-         
+    
+    @staticmethod
+    def getEditorByTime(starttime, endtime):
+        startDate = time.mktime(time.strptime(starttime + "-0", '%Y-%m-%d-%H')) - time.timezone
+        endDate = time.mktime(time.strptime(endtime + "-23-59", '%Y-%m-%d-%H-%M')) - time.timezone
+        return SQL.getAllEditor().filter(start_time__range=(startDate, endDate))
+
     @staticmethod
     def getEditorUserByTime(starttime, endtime, editorname, currPage = None):
         startDate = time.mktime(time.strptime(starttime + "-0", '%Y-%m-%d-%H')) - time.timezone
@@ -154,7 +160,7 @@ class SQL(object):
         if currPage == None:
             return SQL.getAllEditor().filter(Q(start_time__range=(startDate, endDate)), Q(name=editorname))
         else:
-            return SQL.paging(SQL.getAllEditor().filter(Q(start_time__range=(startDate, endDate)), Q(name=editorname)), 20, currPage)
+            return SQL.paging(SQL.getAllEditor().filter(Q(start_time__range=(startDate, endDate)), Q(name=editorname)).order_by('-start_time'), 20, currPage)
 
     @staticmethod
     def getOptByID(eid, currPage):
@@ -201,13 +207,15 @@ class SQL(object):
         return obj.exclude(exit_code="0").count()
     
     @staticmethod
-    def getMaxIPTimes():
-        obj = SQL.getAllEditor().values("client_ip").annotate(ip_times=Count('client_ip')).all().order_by('-ip_times')
-        if len(obj) <= 0:
+    def getMaxIPTimes(obj=None):
+        if obj == None:
+            obj = SQL.getAllEditor()
+        ipObj = obj.values("client_ip").annotate(ip_times=Count('client_ip')).all().order_by('-ip_times')
+        if len(ipObj) <= 0:
             return
-        ip = obj[0]["client_ip"] 
-        obj = SQL.getAllEditor().filter(client_ip=ip).values("name", "client_ip").annotate(times=Count('name')).all().order_by('-times')
-        return obj
+        ip = ipObj[0]["client_ip"] 
+        ipObj = obj.filter(client_ip=ip).values("name", "client_ip").annotate(times=Count('name')).all().order_by('-times')
+        return ipObj
 
 
 def getZeroStamp(stamp):

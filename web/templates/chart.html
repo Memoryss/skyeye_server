@@ -5,12 +5,15 @@
 	<h1 >搜索</h1>
 	<div class="list">
 		<label class="help-block"><s>*</s>查询方式:</label>
-		<select size="1" name="D1" onChange="javascript:queryData('mune_x'+this.value)"> 
+		<select size="1" name="D1" onChange="javascript:queryData('mune_x'+this.value)">
             <option value="1">无</option>
-			<option value="2">时间</option> 
+            <option value="2">时间</option>
 		</select> 
 	</div>
 
+    <div id="x1">
+	
+	</div>
 	<!-------------------------------时间-------------------------------------->
 	<div class="list" id="x2" style="display:none">
 		<div id="dCon2">
@@ -79,6 +82,12 @@
     var searchType = 0
     var chartType = "total"
 
+    Highcharts.setOptions({
+        global: {
+            useUTC: false,
+        }
+    });
+
     var chart = new Highcharts.Chart({
             chart: {  
                 renderTo: 'chart',  
@@ -132,7 +141,7 @@
         },
         series: [{
             type: 'pie',
-            name: '使用量',
+            name: '次数',
         }],
     });
 
@@ -152,11 +161,9 @@
         },
         series: [{
             type: 'pie',
-            name: '使用量',
+            name: '次数',
         }],
     });
-
-    updateIPChart()
 
     function updateType(obj) {
         if (obj.innerHTML == "total") {
@@ -173,7 +180,7 @@
 
     function queryData(Names){
 			var Name
-			for (var i=2;i<3;i++){	//  更改数字4可以改变选择的内容数量，在下拉总数值的基础上+1.比如：下拉菜单有5个值，则4变成6
+			for (var i=1;i<3;i++){	//  更改数字4可以改变选择的内容数量，在下拉总数值的基础上+1.比如：下拉菜单有5个值，则4变成6
 				var tempname="mune_x"+i                                                                            
 				var NewsHot="x"+i	//  “X”是ID名称，比如：ID命名为“case1”，这里的“X”即为“case”
 				if (Names==tempname){
@@ -203,6 +210,7 @@
     }
 
     function updateChartData(data) {
+        console.log(data)
         names = []
         xLists = []
         ySuccessLists = []
@@ -227,18 +235,14 @@
         updateChart(true)
     }
 
-    function updateChart(flag = false) {
-        Highcharts.setOptions({
-            global: {
-                timezoneOffset: -8 * 60
-            }
-        });
-
+    function updateChart(flag) {
         //先清空数据
         if (flag) {
             while(chart.series.length > 0) {  
-                chart.series[0].remove(false);  
-            }  
+                chart.series[0].remove(true);  
+            }
+            chart.setTitle( {text: "total(编辑器个数:" + 0 + ")"})
+            chart.series = []
         }
 
         for (var j = 0; j < yDumpLists.length; ++j) {
@@ -276,7 +280,7 @@
         chart.redraw()
 
         updateCountChart(chartType)
-        //updateIPChart()
+        updateIPChart()
     }
     
     function updateCountChart(type) {
@@ -285,8 +289,9 @@
             param = "&starttime=" + starttime + "&endtime=" + endtime
         }
         $.getJSON("http://" + starturl + "/searchTimes/?type="+type+param, function (data) {
+            //console.log(data)
             if ($.isEmptyObject(data) || data.length <= 0) {
-                countChart.series[0].setData([]])
+                countChart.series[0].setData([])
                 return
             }
             var sortable = []
@@ -298,23 +303,37 @@
                 return a[1] - b[1]
             });
 
+            var seriesData = []
             var size = sortable.length
-            seriesData = [
-                [sortable[0][0], sortable[0][1]],
-                [sortable[1][0], sortable[1][1]],
-                [sortable[2][0], sortable[2][1]],
-                [sortable[size-3][0], sortable[size-3][1]],
-                [sortable[size-2][0], sortable[size-2][1]],
-                [sortable[size-1][0], sortable[size-1][1]],
-            ]
+            if (size <= 5) {
+                for (var i = 0; i < size; ++i) {
+                    seriesData.push(sortable[i][0], sortable[i][1])
+                }
+            }
+            else {
+                seriesData = [
+                    [sortable[0][0], sortable[0][1]],
+                    [sortable[1][0], sortable[1][1]],
+                    [sortable[2][0], sortable[2][1]],
+                    [sortable[size-3][0], sortable[size-3][1]],
+                    [sortable[size-2][0], sortable[size-2][1]],
+                    [sortable[size-1][0], sortable[size-1][1]],
+                ]
+            }
+            
             countChart.series[0].setData(seriesData)
         })
     }
 
     function updateIPChart() {
-        $.getJSON("http://" + starturl + "/searchIPTimes/", function (data) {
-            if (data.length <= 0) {
-                ipChart.series[0].setData([]])
+        var param = ""
+        if (searchType == 2) {
+            param = "?starttime=" + starttime + "&endtime=" + endtime
+        }
+        $.getJSON("http://" + starturl + "/searchIPTimes/" + param, function (data) {
+            console.log(data)
+            if ($.isEmptyObject(data) || data.length <= 0) {
+                ipChart.series[0].setData([])
                 return
             }
 
